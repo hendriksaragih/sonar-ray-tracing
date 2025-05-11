@@ -1,0 +1,352 @@
+/*=============================================================
+  Filename: console-71.css
+
+  Style Sheet for a console type screen.
+
+  Date    Description                                       By
+  -------|-------------------------------------------------|---
+  30Nov09 First release                                     ARC
+  11Jan16 Set a default font-size of 15px                   ARC
+  27Aug17 Make font-size inherited by descendants           ARC
+  08Apr18 Use CSS display:grid                              ARC
+  11Apr18 Use Consolas font for inputs                      ARC
+  15Apr18 Set body margin:0 to avoid horizontal scroll bar  ARC
+  10May18 Set canvas display:block to stop 4px bottom gap   ARC
+  20May18 Added square stop and pause shapes
+          Removed requirement for slider to have a holder   ARC
+  24May20 Added position relative to screenHolder           ARC
+  01Jun20 Added support for slider labels                   ARC
+  27Jun20 Add sliderLabel text-align:center                 ARC
+  26Oct20 Use arrow images not styled divs in buttons
+          Refactored slider labels                          ARC
+  28Oct20 Use background for button images                  ARC
+  19Jan21 Modify .buttonLink to work with CangoControls     ARC
+  27Jan21 Moved spinner properties to frontPanel-38         ARC
+  30Jan21 Use grid-auto-flow: column for buttonHolder       ARC        
+  01Feb21 Rewrite .pageTab to make them radio buttons       ARC
+  24Dec24 Added smart alignment of slider labels            ARC
+  11Mar25 Use radioBtns button for pageTabs
+          Refactor sliders to update to new standards       ARC
+ ==============================================================*/
+
+body
+{
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;  /* this will center console if it has display:inline-block */
+}
+
+canvas {
+  display: block;
+}
+
+.consoleHolder{
+  position: relative;
+  margin: 0 auto;
+  width: 100%;         /* just for centering the console using text-align: center */
+  text-align: center;  /* this will center console if it has display:inline-block */
+}
+
+.consoleBezel {
+  font-size: 15px;
+
+  position: relative;
+  display: inline-block;    /* this allows auto width to be centered with text-align: center */
+
+  margin: 1em 0 0 0;
+  padding: 0.7ex 0.7ex;
+
+  background-color: #e8e8e8;
+  background-image: linear-gradient(to bottom right, #e8e8e8, #e8e8e8 10%, #c8c8c8 90%, #c8c8c8);
+  border-top: 1px #c0c0c0 solid;
+  border-left: 1px #c0c0c0 solid;
+  border-bottom: 1px #b0b0b0 solid;
+  border-right: 1px #b0b0b0 solid;
+  border-radius: 6px;
+  box-shadow: 1px 2px 1px #aaaaaa;
+}
+
+.screenHolder {
+  display: grid;
+  position: relative;
+  min-width: 375px;
+  min-height: 250px;
+  margin: 0.6ex;
+  background-color: #eceae8;
+  border-left: 3px #c8c8c8 solid;
+  border-top: 3px #c8c8c8 solid;
+  border-right: 3px #e0e0e0 solid;
+  border-bottom: 3px #e0e0e0 solid;
+  border-radius: 4px;
+}
+  
+.pagedScreen {
+  display: grid;
+  grid-template-rows: 35px 1fr;
+  min-width: 375px;
+  min-height: 250px;
+  margin: 0.6ex;
+  background-color: white;
+  border-left: 3px #c8c8c8 solid;
+  border-top: 3px #c8c8c8 solid;
+  border-right: 3px #e0e0e0 solid;
+  border-bottom: 3px #e0e0e0 solid;
+  border-radius: 4px;
+}
+  
+.tabHolder {
+  position: relative;
+  padding: 2px 0 0 0;
+  height: 25px;
+  background-color: DarkOliveGreen;
+  border-bottom: solid 8px #eceae8;
+  overflow: visible;
+  z-index: 4;
+}
+
+.tabHolder.radioBtns button {
+  display: block;
+  position: relative;
+  float: left;
+  width: 100px;
+  height: 24px;
+  margin: 1px 0 0 4px;
+  padding: 1px 5px 4px 5px; 
+  box-sizing: border-box;
+  border-top: 1px #bbbbbb solid;
+  border-left: 1px #bbbbbb solid;
+  border-right: 1px #999999 solid;
+  border-bottom: 0px #eceae8 solid;
+  color: #585858;
+  font-family: sans-serif;
+  font-size: inherit;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #a0a0a0;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tabHolder.radioBtns button[data-selected="true"] {
+  height: 25px;
+  background: #eceae8;
+  border-top: 1px #faf9f5 solid;
+  border-left: 1px #faf9f5 solid;
+  border-right: 1px #cac9c5 solid;
+  border-bottom: 0;
+  color: black;
+  font-weight: bold;
+  padding: 2px 5px 4px 5px;
+}
+
+.pageHolder {
+  position: relative;     /*  to be parent of the screenPages  */ 
+  background-color: #eceae8;
+}
+
+.pageGrid {
+  display: grid;
+  grid-auto-flow: column; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-family: Consolas, Monaco, "Andale Mono", monospace;
+  text-align: left;
+  background-color: #eceae8;
+  z-index: 1;
+}
+
+.buttonHolder {
+  display: grid;
+  grid-auto-flow: column; 
+  grid-auto-columns: 1fr;
+  grid-column-gap: 1.5ex;
+  padding: 0.6ex 0.75ex;
+}
+
+.buttonLink {
+  box-sizing: border-box;
+  display: block;
+  /* width: 6em; */
+  height: 1.7em;
+  text-align: center;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 1em;
+  line-height: 1.5em;
+  font-weight: bold;
+  font-style: normal;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  background: #c4c4c4;
+  color: #404040;
+  border-radius: 3px;
+  border: solid 1px #888888;
+  text-shadow: 0px 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.buttonLink:hover {
+  background: #b4b4b4;
+  border: solid 1px #808080;
+  text-decoration: none;
+}
+
+.buttonLink:active {
+  padding: 1px 0 0 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  background: #a4a4a4;
+  border: solid 1px #787878;
+  text-shadow: none;
+}
+
+.buttonLink:disabled {
+  color: #909090;
+}
+
+.buttonLink:hover:disabled {
+  color: #909090;
+}
+
+.arrowBtn.buttonLink{
+  position: relative;
+  width: 1.4em;
+  height: 1.5em;
+  background-image:url('Images/arrow-lft.png'); 
+  background-size: 0.6em 1.1em;     
+  background-repeat: no-repeat; 
+  background-position: center 40%;  
+}
+
+button:focus {
+  outline: 0;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+.sliderHolder {  /* sliderHolder parent must have width >= 10em */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2.5ex;
+  padding: 0 2px;
+  margin: 0.6ex;
+  background-color: #c0c0c0;
+  border-top: 1px #888888 solid;
+  border-bottom: 1px #e0e0e0 solid;
+  border-right: 1px #e0e0e0 solid;
+  border-radius: 4px;
+}
+
+.sliderLabel {
+  display: block;
+  background-color: #c0c0c0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.8em;
+  line-height: 1em;
+  text-align: center;
+  width: 95%;
+  padding: 0;
+  margin: 1px auto 0 auto;
+}
+
+input[type="range"].slider {
+  box-sizing: border-box;
+  appearance: none;
+  width: 95%;
+  height: 1.4em;
+  margin: 1px auto 2px auto;
+  border: none;
+  padding: 0;
+  outline: none; /* no focus outline */
+  background-color: transparent;
+  accent-color: #404040; /* Standard property for slider track color */
+}
+
+/* Track styling */
+input[type="range"].slider::-webkit-slider-runnable-track {
+  background: #404040;
+  height: 5px;
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 1px #a0a0a0, inset -1px -1px 1px #f0f0f0;
+}
+
+input[type="range"].slider::-moz-range-track {
+  background: #404040;
+  height: 5px;
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 1px #a0a0a0, inset -1px -1px 1px #f0f0f0;
+}
+
+/* Thumb styling */
+input[type="range"].slider::-webkit-slider-thumb {
+  appearance: none; /* Remove default styling */
+  width: 30px;
+  height: 13px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border-radius: 3px;
+  background-image: linear-gradient(to bottom, #eeeeee 0, #cccccc 100%);
+  cursor: pointer;
+  margin-top: -4px; /* Adjust thumb position vertically */
+}
+
+input[type="range"].slider::-moz-range-thumb {
+  appearance: none; /* Remove default styling */
+  width: 30px;
+  height: 13px;
+  border-radius: 3px;
+  background-image: linear-gradient(to bottom, #eeeeee 0, #cccccc 100%);
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  cursor: pointer;
+}
+
+/* Remove focus outline */
+input[type="range"].slider:focus {
+  outline: none;
+}
+/* Label alignment */
+.sliderLabel div {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.sliderLabel div span {
+  flex: 1; /* Ensure spans take equal space */
+  text-align: center; /* Default to center-align */
+}
+
+/* Special case: Single child, center it */
+.sliderLabel div:only-child,
+.sliderLabel div:has(:only-child) {
+  justify-content: center; /* Center align for a single span */
+}
+
+/* For two children: left and right align */
+.sliderLabel div span:first-child:nth-last-child(2) {
+  text-align: left; /* Align the first span to the left */
+}
+
+.sliderLabel div span:last-child:nth-child(2) {
+  text-align: right; /* Align the second span to the right */
+}
+
+/* For three children: left, center, right align */
+.sliderLabel div span:first-child:nth-last-child(3) {
+  text-align: left; /* Align the first span to the left */
+}
+
+.sliderLabel div span:nth-child(2):nth-last-child(2) {
+  text-align: center; /* Center-align the middle span */
+}
+
+.sliderLabel div span:last-child:nth-child(3) {
+  text-align: right; /* Align the last span to the right */
+}
