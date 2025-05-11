@@ -1798,10 +1798,4 @@ var Axes, BoxAxes, Xaxis, Yaxis, sprintf, toEngFixed, toEngPrec, toEngNotation, 
     this.render(axes);
   };
 
-  Cango.prototype.drawBoxAxes = function(xMin, xMax, yMin, yMax, opts)
-  {
-    const boxAxes = new BoxAxes(xMin, xMax, yMin, yMax, opts);
-    this.render(boxAxes);
-  };
-
 }()); 

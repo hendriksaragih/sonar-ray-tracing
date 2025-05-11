@@ -31,7 +31,7 @@
   08Mar18 bugfix: ray angle, b, not initialised         ARC
   =========================================================*/
 
-  var Bathy, plotTemp, plotSpeed, plotFan;
+  var Bathy, plotFan;
 
   (function(){
     'use strict';
@@ -135,111 +135,6 @@
       }
     }
     this.speed[0] = 10E6; // force reflection at the top slab (surface?)
-  };
-
-  plotTemp = function(g, bthy, depthScale)
-  {
-    var xmin = -5,
-        xmax = 35,
-        ymin = 0.0,
-        ymax = depthScale,   // extents of plotting area (ymax>ymin)
-        data = [],
-        slab,
-        gradObj = new LinearGradient(0, 0, 0, 0.05*(xmax-xmin));
-
-    gradObj.addColorStop(0, 'dimgray');
-    gradObj.addColorStop(1, 'white');
-
-    g.clearCanvas("#ffffff");
-    g.setWorldCoordsSVG(xmin, ymin, xmax-xmin, ymax-ymin);
-    g.drawAxes(xmin, xmax, ymin, ymax, {
-      xUnits:"deg C",
-      yUnits: "m",
-    //  y10thsOK: true,
-      xLabel: "Temp",
-      yLabel: "Depth",
-      fontSize: 11,
-      strokeColor: "#888888",      // axes
-      fillColor: "#404040" });     // text
-      // plot bottom if on screen
-    if (bthy.btmDepth < ymax)
-    {
-      g.drawShape(["M",0, 0, 'l', xmax-xmin, 0, 0, 0.05*(xmax-xmin), xmin-xmax, 0, 'z'], {
-        x:xmin, y:bthy.btmDepth, fillColor:gradObj});
-    }
-    if (bthy.topDepth > 0)
-    {
-      g.drawPath([xmin, bthy.topDepth, xmax, bthy.topDepth]);    // draw bottom face of ice
-    }
-    for(slab=0; slab < bthy.tempData.length; slab++)
-    {
-      if(bthy.depthData[slab] >= bthy.btmDepth)      // plot just past btmDepth
-      {
-        data.push(bthy.tempData[slab]);       // data is a one dimensional array
-        data.push(bthy.btmDepth);
-        break;
-      }
-      if(bthy.depthData[slab] >= ymax)      // clip at ymax
-      {
-        data.push(bthy.tempData[slab]);
-        data.push(ymax);
-        break;
-      }
-      data.push(bthy.tempData[slab]);
-      data.push(bthy.depthData[slab]);
-    }
-    g.drawPath(data);
-  };
-
-  plotSpeed = function(g, bthy, depthScale)
-  {
-    var xmin = 1430.0,
-        xmax = 1560.0,
-        ymin = 0.0,
-        ymax = depthScale,   // extents of plotting area (ymax>ymin)
-        data = [],
-        i,
-        dpth,
-        gradObj = new LinearGradient(0, 0, 0, 0.05*(xmax-xmin));
-
-    gradObj.addColorStop(0, 'dimgray');
-    gradObj.addColorStop(1, 'white');
-
-    g.clearCanvas("#ffffff");
-    g.setWorldCoordsSVG(xmin, ymin, xmax-xmin, ymax-ymin);
-    g.drawAxes(xmin, xmax, ymin, ymax, {
-      xUnits:"m/sec",
-      yUnits: "m",
-   //   y10thsOK: true,
-      xLabel: "Sound Speed",
-      yLabel: "Depth",
-      fontSize: 11,
-      strokeColor: "#888888",      // axes
-      fillColor: "#404040" });
-    // plot bottom if on screen
-    if (bthy.btmDepth < ymax)
-    {
-      g.drawShape(["M",0, 0, 'l', xmax-xmin, 0, 0, 0.05*(xmax-xmin), xmin-xmax, 0, 'z'], {
-        x:xmin, y:bthy.btmDepth, fillColor:gradObj});
-    }
-    if (bthy.topDepth > 0)
-    {
-      g.drawPath([xmin, bthy.topDepth, xmax, bthy.topDepth]);    // draw bottom face of ice
-    }
-    dpth = bthy.topDepth;
-    data.push(bthy.speed[1]);      // don't use speed[0] its 100000 to force reflection
-    data.push(dpth);   // depth at topSlab (surface?)
-    for (i=1; i < bthy.speed.length; i++)
-    {
-      dpth += bthy.dz[i];
-      data.push(bthy.speed[i]);
-      data.push(dpth);
-      if ((dpth > bthy.btmDepth)||(dpth>ymax))   // stop at bottom of graph or bottom of ocean
-      {
-        break;
-      }
-    }
-    g.drawPath(data);
   };
 
   function scaleGraph(g, bthy, rangeScale, depthScale)

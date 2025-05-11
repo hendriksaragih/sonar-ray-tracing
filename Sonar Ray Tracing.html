@@ -57,10 +57,8 @@
     <script>
         "use strict";
         // readout
-        let tmpGC, spdGC, rayGC,
-            depRO1, depRO2, rngRO, fanRO, spcRO, srcRO, angRO;
-        const minLat = -90 + Math.floor(latInc / 2),
-            minLon = -180 + Math.floor(lonInc / 2);
+        let rayGC,
+            depRO2, rngRO, fanRO, spcRO, srcRO, angRO;
         let currPage = 2,
             currBathy,
             currLat = 22,                // MH370 search area
@@ -92,7 +90,7 @@
             const id = btn.id,
                 fn = id.slice(3, 6),
                 parm = id.slice(0, 3);
-
+            
             if (fn === "Rpg") {
                 // set current knob target
                 if (parm === "src") {
@@ -114,18 +112,6 @@
                 }
                 // set the current range scale and re-plot
                 rngScale = rngRO.value = rngVals[rngIdx];
-            } else if (parm === "dep") {
-                depIdx += (fn === "Inc") ? 1 : -1;
-                if (depIdx > depIdxMax) {
-                    depIdx = depIdxMax;
-                }
-                if (depIdx < 0) {
-                    depIdx = 0;
-                }
-                // set the current depth scale and re-plot
-                dpthScale = depRO1.value = depRO2.value = depVals[depIdx];
-                plotTemp(tmpGC, currBathy, dpthScale);
-                plotSpeed(spdGC, currBathy, dpthScale);
             } else if (parm === "dth") {
                 depIdx += (fn === "Inc") ? 1 : -1;
                 if (depIdx > depIdxMax) {
@@ -135,7 +121,7 @@
                     depIdx = 0;
                 }
                 // set the current depth scale and re-plot
-                dpthScale = depRO1.value = depRO2.value = depVals[depIdx];
+                dpthScale = depRO2.value = depVals[depIdx];
             } else if (parm === "fan") {
                 fanIdx += (fn === "Inc") ? 1 : -1;
                 if (fanIdx > fanIdxMax) {
@@ -215,42 +201,13 @@
             }
         }
 
-        function listBathy(bathy) {
-            var taNode = document.getElementById("bathyList"),
-                list = "",
-                listNode;
-
-            // remove existing child txt node
-            while (taNode.firstChild) {
-                taNode.removeChild(taNode.firstChild);
-            }
-
-            list += "  Lat   Long\n";
-            list += sprintf("%5d, %5d\n", currLat, currLong);
-            list += " Depth  Temp";
-            // list the data pairs as a text node
-            for (let j = 0; j < bathy.tempData.length; j++) {
-                if (bathy.tempData[j]) {
-                    list += sprintf("\n%4d, %6.2f", bathy.depthData[j], bathy.tempData[j]);
-                }
-            }
-
-            listNode = document.createTextNode(list);
-            taNode.appendChild(listNode);
-        }
-
         function init() {
 
             // plot contexts
-            tmpGC = new Cango("tmpCvs");
-            tmpGC.gridboxPadding(21, 4, 7, 16);
-            spdGC = new Cango("spdCvs");
-            spdGC.gridboxPadding(21, 4, 7, 16);
             rayGC = new Cango("rayCvs");
             rayGC.gridboxPadding(10, 3, 3, 8);
 
             // readouts
-            depRO1 = document.getElementById("depScale1");
             depRO2 = document.getElementById("depScale2");
             rngRO = document.getElementById("rngScale");
             fanRO = document.getElementById("fanBeams");
@@ -258,7 +215,7 @@
             srcRO = document.getElementById("srcVal");
             angRO = document.getElementById("angVal");
 
-            depRO1.value = depRO2.value = dpthScale;
+            depRO2.value = dpthScale;
             rngRO.value = rngScale;
             fanRO.value = fanRays;
             fanRO.disabled = false;
@@ -271,59 +228,12 @@
 
             // load the default bathy
             currBathy = fetchBathy(currSeason, currLat, currLong);
-
-            // start on ray trace page
-//      document.getElementById("trace").checked = true;
-        }
-
-        const pageCallbacks = [
-            function () {
-                currPage = 0;
-                listBathy(currBathy);
-            },
-            function () {
-                currPage = 1;
-                plotTemp(tmpGC, currBathy, dpthScale);
-                plotSpeed(spdGC, currBathy, dpthScale);
-            },
-            function () {
-                currPage = 2;
-                plotFan(rayGC, currBathy, rayAngle, fanRays, spcRays, srcDepth, dpthScale, rngScale);
-            }
-        ];
-
-
-        window.seasonBtns = function (inp) {
-            currSeason = inp.id;
-
-            const testBathy = fetchBathy(currSeason, currLat, currLong);
-            if (testBathy) {
-                currBathy = testBathy;
-            }
-            listBathy(currBathy);
-        }
-
-        window.gridHandler = function (cell) {
-            const row = 11 - cell.parentNode.rowIndex,  // count rows from the bottom up
-                col = cell.cellIndex,
-                testLat = (minLat + row * 15),
-                testLong = (minLon + col * 15),
-                testBathy = fetchBathy(currSeason, testLat, testLong);
-
-            if (testBathy) {
-                currBathy = testBathy;
-                currLat = testLat;
-                currLong = testLong;
-                listBathy(currBathy);
-            }
-
         }
 
         window.addEventListener("load", function () {
-
             const knob1 = new Knob("knob1", window.rgpHandler);
             init();
-            pageCallbacks[2]();
+            plotFan(rayGC, currBathy, rayAngle, fanRays, spcRays, srcDepth, dpthScale, rngScale);
         });
     </script>
 
@@ -342,68 +252,10 @@
                         <div class="pagedScreen">
 
                             <div class="tabHolder radioBtns">
-                                <button class="pageTab" data-selected="false" id="pg0" type="button">Load Bathy</button>
-                                <button class="pageTab" data-selected="false" id="pg1" type="button">Plot Bathy</button>
                                 <button class="pageTab" data-selected="true" id="pg2" type="button">Ray Trace</button>
                             </div>
 
                             <div class="pageHolder" style="width:700px; height:452px;">
-
-                                <!--  bathyLoader  (page 0)  -->
-                                <div class="pageGrid" id="bathyLoader"
-                                     style="grid-template-columns: 1fr 9em; z-index: 1;">
-                                    <div style="position:relative; float:left; margin:0 0 0 3px; font-size: 12px">
-                                        <p style="margin-left:10px">To load bathymetry data:<br><br>
-                                            1. Select a month typical of the desired season<br>
-                                            2. Click on the shaded grid square at the desired location</p>
-
-                                        <div class="radioBtns" id="seasons"
-                                             style="display: grid; grid-template-columns: repeat(4, 3em 1fr); font-size: 12px; line-height: 1.8em; height: 2.5em; margin-top:3em;">
-                                            <button class="ledBtn small" data-selected="true" id="January"
-                                                    type="button"></button>
-                                            <label>January</label>
-
-                                            <button class="ledBtn small" data-selected="false" id="April"
-                                                    type="button"></button>
-                                            <label>April</label>
-
-                                            <button class="ledBtn small" data-selected="false" id="July"
-                                                    type="button"></button>
-                                            <label>July</label>
-
-                                            <button class="ledBtn small" data-selected="false" id="October"
-                                                    type="button"></button>
-                                            <label>October</label>
-                                        </div>
-
-
-                                    </div>
-
-                                </div> <!--  bathyLoader  (page 0)  -->
-
-                                <!--  bathyPlotter (page 1) -->
-                                <div class="pageGrid" id="bathyPlotter"
-                                     style="grid-template-columns: 1fr 1fr 9em; z-index: 1;">
-                                    <div class="rayTraceCvs">
-                                        <canvas id="tmpCvs" width="271" height="442"></canvas>
-                                    </div>
-
-                                    <div class="rayTraceCvs">
-                                        <canvas id="spdCvs" width="271" height="442"></canvas>
-                                    </div>
-
-                                    <div style="position:relative;padding: 1em 0 0 1em;">
-                                        <label class="valueLabel" for="depScale1">Depth Scale</label>
-                                        <div class="spinner" style="width: 5.5em">
-                                            <input id="depScale1" value="0" type="text" readonly="">
-                                            <button id="depInc" type="button" class="buttonInc"
-                                                    onclick="window.valBtnHandler(this)"></button>
-
-                                            <button id="depDec" type="button" class="buttonDec"
-                                                    onclick="window.valBtnHandler(this)"></button>
-                                        </div>
-                                    </div>
-                                </div>  <!--  bathyPlotter (page 1) -->
 
                                 <!-- rayTracer (page 2) -->
                                 <div class="pageGrid" id="rayTracer"
